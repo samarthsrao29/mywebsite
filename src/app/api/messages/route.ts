@@ -18,14 +18,18 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { senderName, senderEmail, phoneNumber, content, paintingId } = body;
 
-        if (!content || !senderEmail) {
-            return NextResponse.json({ error: 'Content and Email are required' }, { status: 400 });
+        if (!content) {
+            return NextResponse.json({ error: 'Message content is required' }, { status: 400 });
+        }
+
+        if (!senderEmail && !phoneNumber) {
+            return NextResponse.json({ error: 'Either email or phone number is required' }, { status: 400 });
         }
 
         const message = await prisma.message.create({
             data: {
                 senderName,
-                senderEmail,
+                senderEmail: senderEmail || null,
                 phoneNumber,
                 content,
                 paintingId: paintingId ? parseInt(paintingId) : null,

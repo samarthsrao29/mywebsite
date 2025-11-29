@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client';
 
 export async function POST(
     request: Request,
-    { params }: { params: Promise<{ id: string }> }
+    { params }: { params: Promise<{ id: string }>; }
 ) {
     const { id } = await params;
     const paintingId = parseInt(id);
@@ -51,25 +51,43 @@ export async function POST(
             },
         });
 
+        let painting;
+
         if (existingLike) {
-            return NextResponse.json({ error: 'Already liked' }, { status: 400 });
+            // Unlike: Delete like and decrement count
+            [, painting] = await db.$transaction([
+                db.like.delete({
+                    where: {
+                        userId_paintingId: {
+                            userId,
+                            paintingId,
+                        },
+                    },
+                }),
+                db.painting.update({
+                    where: { id: paintingId },
+                    data: { likes: { decrement: 1 } },
+                }),
+            ]);
+
+            return NextResponse.json({ ...painting, liked: false });
+        } else {
+            // Like: Create like and increment count
+            [, painting] = await db.$transaction([
+                db.like.create({
+                    data: {
+                        userId,
+                        paintingId,
+                    },
+                }),
+                db.painting.update({
+                    where: { id: paintingId },
+                    data: { likes: { increment: 1 } },
+                }),
+            ]);
+
+            return NextResponse.json({ ...painting, liked: true });
         }
-
-        // Create like and increment count
-        const [like, painting] = await db.$transaction([
-            db.like.create({
-                data: {
-                    userId,
-                    paintingId,
-                },
-            }),
-            db.painting.update({
-                where: { id: paintingId },
-                data: { likes: { increment: 1 } },
-            }),
-        ]);
-
-        return NextResponse.json(painting);
     } catch (error: any) {
         console.error('Like error:', error);
         return NextResponse.json({ error: `Failed to like painting: ${error.message}` }, { status: 500 });

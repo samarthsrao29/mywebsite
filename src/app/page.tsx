@@ -48,31 +48,58 @@ export default async function Home() {
         );
     }
 
-    // If user is logged in, show the gallery
+    // If user is logged in, fetch paintings with user's like status
     const paintings = await prisma.painting.findMany({
         orderBy: { createdAt: 'desc' },
+        include: {
+            likesList: {
+                where: { userId: parseInt(userSession) },
+                select: { id: true }
+            }
+        }
     });
 
-    return (
-        <div className="container py-8">
-            <header className="mb-12 text-center">
-                <h1 className="text-4xl md:text-5xl font-serif mb-4">Gallery</h1>
-                <p className="text-[var(--accent)] max-w-2xl mx-auto">
-                    Explore a collection of fine art paintings. Each piece tells a unique story through color and texture.
-                </p>
-            </header>
+    // Transform to include liked status
+    const paintingsWithLiked = paintings.map(painting => ({
+        ...painting,
+        userLiked: painting.likesList.length > 0,
+        likesList: undefined // Remove from response
+    }));
 
-            {paintings.length === 0 ? (
-                <div className="text-center py-20 text-[var(--accent)]">
-                    <p>No paintings found. Visit the Admin Dashboard to add some.</p>
+    return (
+        <div className="min-h-screen">
+            {/* Hero Section */}
+            <section className="relative h-[60vh] flex items-center justify-center bg-[var(--accent-light)] overflow-hidden mb-16">
+                <div className="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center"></div>
+                <div className="container relative z-10 text-center animate-slide-up">
+                    <h1 className="text-5xl md:text-7xl font-serif mb-6 tracking-tight">
+                        Artistry <span className="text-[var(--accent)] italic">&</span> Soul
+                    </h1>
+                    <p className="text-xl md:text-2xl text-[var(--accent)] max-w-2xl mx-auto font-light leading-relaxed">
+                        Explore a curated collection where every stroke tells a story.
+                    </p>
                 </div>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {paintings.map((painting) => (
-                        <PaintingCard key={painting.id} painting={painting} />
-                    ))}
-                </div>
-            )}
+            </section>
+
+            <div className="container pb-20">
+                {paintings.length === 0 ? (
+                    <div className="text-center py-20 text-[var(--accent)] animate-fade-in">
+                        <p>No paintings found. Visit the Admin Dashboard to add some.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {paintings.map((painting, index) => (
+                            <div
+                                key={painting.id}
+                                className="animate-scale-in"
+                                style={{ animationDelay: `${index * 100}ms` }}
+                            >
+                                <PaintingCard painting={painting} />
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

@@ -17,7 +17,10 @@ export default function UserLoginPage() {
         try {
             const res = await fetch('/api/auth/user/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true',
+                },
                 body: JSON.stringify({ email, password }),
             });
 

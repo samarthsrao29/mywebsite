@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-export default function MessageForm({ paintingId }: { paintingId?: number }) {
+export default function MessageForm({ paintingId, userEmail }: { paintingId?: number; userEmail?: string }) {
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -11,8 +11,7 @@ export default function MessageForm({ paintingId }: { paintingId?: number }) {
 
         const formData = new FormData(e.currentTarget);
         const data = {
-            senderName: formData.get('senderName'),
-            senderEmail: formData.get('senderEmail'),
+            senderEmail: userEmail, // Use logged-in user's email
             phoneNumber: formData.get('phoneNumber'),
             content: formData.get('content'),
             paintingId: paintingId,
@@ -23,6 +22,7 @@ export default function MessageForm({ paintingId }: { paintingId?: number }) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true',
                 },
                 body: JSON.stringify(data),
             });
@@ -39,47 +39,42 @@ export default function MessageForm({ paintingId }: { paintingId?: number }) {
     };
 
     return (
-        <div className="bg-[var(--background)] border border-[var(--border)] p-6 rounded-lg">
-            <h3 className="text-xl font-serif mb-4">Inquire about this piece</h3>
+        <div className="card p-6">
+            <h3 className="text-2xl font-serif mb-6 font-semibold">Inquire about this piece</h3>
             {status === 'success' ? (
-                <div className="text-green-600 p-4 bg-green-50 rounded">
-                    Message sent successfully! The artist will get back to you soon.
+                <div className="text-green-600 p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
+                    <p className="font-medium">Message sent successfully!</p>
+                    <p className="text-sm mt-1">Thank you for your message and support</p>
                 </div>
             ) : (
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-4">
-                        <label htmlFor="senderName" className="label">Name (Optional)</label>
-                        <input type="text" id="senderName" name="senderName" className="input" />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="senderEmail" className="label">Email *</label>
-                        <input type="email" id="senderEmail" name="senderEmail" required className="input" />
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="phoneNumber" className="label">Phone Number</label>
-                        <input type="tel" id="phoneNumber" name="phoneNumber" className="input mb-1" />
-                        <div className="text-xs text-[var(--accent)] flex items-center gap-1">
-                            Is this your WhatsApp number?
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label htmlFor="phoneNumber" className="label">Phone Number (Optional)</label>
+                        <input type="tel" id="phoneNumber" name="phoneNumber" className="input" placeholder="+1 234 567 8900" />
+                        <div className="text-xs text-[var(--accent)] mt-1">
+                            💬 Is this your WhatsApp number?
                         </div>
                     </div>
-                    <div className="mb-4">
+                    <div>
                         <label htmlFor="content" className="label">Message *</label>
                         <textarea
                             id="content"
                             name="content"
                             required
-                            rows={4}
+                            rows={5}
                             className="input resize-none"
                             placeholder="Hi, I'm interested in this painting..."
                         />
                     </div>
                     {status === 'error' && (
-                        <div className="text-red-600 mb-4 text-sm">Failed to send message. Please try again.</div>
+                        <div className="text-red-600 p-3 bg-red-50 dark:bg-red-950 rounded-lg text-sm border border-red-200 dark:border-red-800">
+                            Failed to send message. Please try again.
+                        </div>
                     )}
                     <button
                         type="submit"
                         disabled={status === 'loading'}
-                        className="btn btn-primary w-full"
+                        className="btn btn-primary w-full py-3 text-base"
                     >
                         {status === 'loading' ? 'Sending...' : 'Send Message'}
                     </button>

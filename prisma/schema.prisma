@@ -24,7 +24,7 @@ model Painting {
 model Message {
   id          Int      @id @default(autoincrement())
   senderName  String?
-  senderEmail String
+  senderEmail String?
   phoneNumber String?
   content     String
   reply       String?
@@ -38,6 +38,9 @@ model User {
   email     String   @unique
   password  String
   name      String?
+  isVerified Boolean   @default(false)
+  otp        String?
+  otpExpires DateTime?
   createdAt DateTime @default(now())
   likes     Like[]
 }

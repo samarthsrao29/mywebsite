@@ -1,22 +1,26 @@
 :root {
-  --background: #ffffff;
-  --foreground: #1a1a1a;
-  --accent: #666666;
-  --accent-light: #f5f5f7;
-  --border: #e5e5e5;
-  --error: #e53e3e;
-  --success: #38a169;
-  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+  --background: #fafbfc;
+  --foreground: #0f172a;
+  --accent: #64748b;
+  --accent-light: #f1f5f9;
+  --border: #e2e8f0;
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --error: #ef4444;
+  --success: #10b981;
+  --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --accent: #a0a0a0;
-    --accent-light: #1a1a1a;
-    --border: #333333;
+    --background: #0f172a;
+    --foreground: #f1f5f9;
+    --accent: #94a3b8;
+    --accent-light: #1e293b;
+    --border: #334155;
+    --primary: #818cf8;
+    --primary-dark: #6366f1;
     --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
     --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
   }
@@ -91,14 +95,17 @@ img {
 }
 
 .btn-primary {
-  background-color: var(--foreground);
-  color: var(--background);
-  border-color: var(--foreground);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+  font-weight: 600;
+  letter-spacing: 0.025em;
 }
 
 .btn-primary:hover {
-  background-color: var(--accent);
-  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
 }
 
 .btn-outline {
@@ -113,18 +120,20 @@ img {
 
 .input {
   width: 100%;
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background-color: transparent;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background-color: var(--background);
   color: var(--foreground);
   font-family: inherit;
   margin-bottom: 1rem;
+  transition: all 0.2s ease;
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .label {
@@ -152,14 +161,16 @@ img {
 .card {
   background-color: var(--background);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 16px;
   box-shadow: var(--card-shadow);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
 
 .card:hover {
   box-shadow: var(--card-shadow-hover);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  border-color: var(--primary);
 }
 
 .input-premium {
@@ -639,4 +650,67 @@ img {
 
 .group:hover .group-hover\:text-\[var\(--accent\)\] {
   color: var(--accent);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.8s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.6s ease-out forwards;
+}
+
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+.delay-500 {
+  animation-delay: 500ms;
 }

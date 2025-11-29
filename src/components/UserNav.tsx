@@ -20,7 +20,10 @@ export default function UserNav({ user }: UserNavProps) {
 
     const handleLogout = async () => {
         try {
-            await fetch('/api/auth/user/logout', { method: 'POST' });
+            await fetch('/api/auth/user/logout', {
+                method: 'POST',
+                headers: { 'ngrok-skip-browser-warning': 'true' }
+            });
             window.location.href = "/login";
         } catch (error) {
             console.error("Logout failed", error);

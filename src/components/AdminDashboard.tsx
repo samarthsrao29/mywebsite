@@ -40,8 +40,8 @@ export default function AdminDashboard() {
         setLoading(true);
         try {
             const [paintingsRes, messagesRes] = await Promise.all([
-                fetch('/api/paintings'),
-                fetch('/api/messages')
+                fetch('/api/paintings', { headers: { 'ngrok-skip-browser-warning': 'true' } }),
+                fetch('/api/messages', { headers: { 'ngrok-skip-browser-warning': 'true' } })
             ]);
 
             if (paintingsRes.ok) setPaintings(await paintingsRes.json());
@@ -57,7 +57,10 @@ export default function AdminDashboard() {
         if (!confirm('Are you sure you want to delete this painting?')) return;
 
         try {
-            const res = await fetch(`/api/paintings/${id}`, { method: 'DELETE' });
+            const res = await fetch(`/api/paintings/${id}`, {
+                method: 'DELETE',
+                headers: { 'ngrok-skip-browser-warning': 'true' }
+            });
             if (res.ok) {
                 setPaintings(prev => prev.filter(p => p.id !== id));
             }
@@ -70,7 +73,10 @@ export default function AdminDashboard() {
         if (!confirm('Are you sure you want to delete this message?')) return;
 
         try {
-            const res = await fetch(`/api/messages/${id}`, { method: 'DELETE' });
+            const res = await fetch(`/api/messages/${id}`, {
+                method: 'DELETE',
+                headers: { 'ngrok-skip-browser-warning': 'true' }
+            });
             if (res.ok) {
                 setMessages(prev => prev.filter(m => m.id !== id));
             }
@@ -88,6 +94,7 @@ export default function AdminDashboard() {
         try {
             const res = await fetch('/api/paintings', {
                 method: 'POST',
+                headers: { 'ngrok-skip-browser-warning': 'true' },
                 body: formData,
             });
 
@@ -169,8 +176,8 @@ export default function AdminDashboard() {
                         <button
                             onClick={() => setActiveTab('paintings')}
                             className={`px-6 py-2 rounded-full transition-all duration-300 ${activeTab === 'paintings'
-                                    ? 'bg-[var(--foreground)] text-[var(--background)] shadow-md'
-                                    : 'text-[var(--accent)] hover:text-[var(--foreground)]'
+                                ? 'bg-[var(--foreground)] text-[var(--background)] shadow-md'
+                                : 'text-[var(--accent)] hover:text-[var(--foreground)]'
                                 }`}
                         >
                             Paintings
@@ -178,8 +185,8 @@ export default function AdminDashboard() {
                         <button
                             onClick={() => setActiveTab('messages')}
                             className={`px-6 py-2 rounded-full transition-all duration-300 ${activeTab === 'messages'
-                                    ? 'bg-[var(--foreground)] text-[var(--background)] shadow-md'
-                                    : 'text-[var(--accent)] hover:text-[var(--foreground)]'
+                                ? 'bg-[var(--foreground)] text-[var(--background)] shadow-md'
+                                : 'text-[var(--accent)] hover:text-[var(--foreground)]'
                                 }`}
                         >
                             Messages
@@ -261,11 +268,11 @@ export default function AdminDashboard() {
                                                     <Heart className="w-3 h-3" /> Liked by:
                                                 </div>
                                                 {painting.likesList && painting.likesList.length > 0 ? (
-                                                    <div className="flex flex-wrap gap-1">
+                                                    <div className="flex flex-col gap-1">
                                                         {painting.likesList.map((like, i) => (
-                                                            <span key={i} className="text-xs bg-[var(--accent-light)] px-2 py-1 rounded text-[var(--accent)]" title={like.user.email}>
+                                                            <div key={i} className="text-xs bg-[var(--accent-light)] px-2 py-1 rounded text-[var(--accent)]" title={like.user.email}>
                                                                 {like.user.name || like.user.email}
-                                                            </span>
+                                                            </div>
                                                         ))}
                                                     </div>
                                                 ) : (
@@ -299,54 +306,37 @@ export default function AdminDashboard() {
                                 </div>
                             ) : (
                                 messages.map(msg => (
-                                    <div key={msg.id} className="card p-6 hover:border-[var(--foreground)] transition-colors">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-[var(--accent-light)] flex items-center justify-center text-lg font-serif">
-                                                    {msg.senderName ? msg.senderName[0].toUpperCase() : '?'}
+                                    <div key={msg.id} className="card p-6 hover:border-[var(--primary)] transition-colors">
+                                        <div className="flex justify-between items-start gap-4">
+                                            <div className="flex-1">
+                                                {/* Email */}
+                                                <div className="flex items-center gap-2 mb-3">
+                                                    <span className="text-sm font-medium text-[var(--accent)]">From:</span>
+                                                    <span className="text-base font-semibold">{msg.senderEmail || 'No email provided'}</span>
                                                 </div>
-                                                <div>
-                                                    <h3 className="font-bold text-lg leading-tight">{msg.senderName || 'Anonymous'}</h3>
-                                                    <p className="text-xs text-[var(--accent)]">
-                                                        {new Date(msg.createdAt).toLocaleDateString(undefined, {
-                                                            weekday: 'long',
-                                                            year: 'numeric',
-                                                            month: 'long',
-                                                            day: 'numeric'
-                                                        })}
-                                                    </p>
+
+                                                {/* Painting Name */}
+                                                {msg.painting && (
+                                                    <div className="flex items-center gap-2 mb-3 bg-[var(--accent-light)] px-3 py-1.5 rounded-lg inline-flex">
+                                                        <ImageIcon className="w-4 h-4 text-[var(--accent)]" />
+                                                        <span className="text-sm font-medium">Re: {msg.painting.title}</span>
+                                                    </div>
+                                                )}
+
+                                                {/* Message */}
+                                                <div className="mt-4 p-4 bg-[var(--accent-light)] rounded-lg">
+                                                    <p className="text-[var(--foreground)] whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                                                 </div>
                                             </div>
+
+                                            {/* Delete Button */}
                                             <button
                                                 onClick={() => handleDeleteMessage(msg.id)}
-                                                className="text-gray-400 hover:text-red-500 p-2 rounded-full hover:bg-red-50 transition-colors"
+                                                className="bg-red-500 hover:bg-red-600 text-white p-2.5 rounded-lg transition-colors flex-shrink-0"
                                                 title="Delete Message"
                                             >
                                                 <Trash2 className="w-5 h-5" />
                                             </button>
-                                        </div>
-
-                                        <div className="pl-13 ml-13 border-l-2 border-[var(--border)] pl-4 mb-4">
-                                            {msg.painting && (
-                                                <div className="flex items-center gap-2 mb-3 bg-[var(--accent-light)] p-2 rounded-lg inline-flex">
-                                                    <ImageIcon className="w-4 h-4 text-[var(--accent)]" />
-                                                    <span className="text-sm font-medium">Re: {msg.painting.title}</span>
-                                                </div>
-                                            )}
-                                            <p className="text-[var(--foreground)] whitespace-pre-wrap leading-relaxed">{msg.content}</p>
-                                        </div>
-
-                                        <div className="flex gap-4 text-sm text-[var(--accent)] pl-4">
-                                            {msg.senderEmail && (
-                                                <span className="flex items-center gap-1">
-                                                    ✉️ {msg.senderEmail}
-                                                </span>
-                                            )}
-                                            {msg.phoneNumber && (
-                                                <span className="flex items-center gap-1">
-                                                    📞 {msg.phoneNumber}
-                                                </span>
-                                            )}
                                         </div>
                                     </div>
                                 ))
