@@ -20,7 +20,7 @@ export default async function Home() {
     // If user is not logged in, show welcome page
     if (!user) {
         return (
-            <div className="container py-8">
+            <div className="container pt-60 pb-8">
                 <div className="max-w-4xl mx-auto text-center py-20">
                     <h1 className="text-5xl md:text-6xl font-serif mb-6">Welcome to Artist Gallery</h1>
                     <p className="text-xl text-[var(--accent)] mb-8 max-w-2xl mx-auto">
@@ -53,7 +53,7 @@ export default async function Home() {
         orderBy: { createdAt: 'desc' },
         include: {
             likesList: {
-                where: { userId: parseInt(userSession) },
+                where: { userId: parseInt(userSession!) },
                 select: { id: true }
             }
         }

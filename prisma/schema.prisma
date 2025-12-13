@@ -42,6 +42,8 @@ model User {
   otp        String?
   otpExpires DateTime?
   createdAt DateTime @default(now())
+  resetToken String?
+  resetTokenExpiry DateTime?
   likes     Like[]
 }
 
