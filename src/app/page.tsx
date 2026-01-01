@@ -17,6 +17,7 @@ export default async function Home() {
         });
     }
 
+
     // If user is not logged in, show welcome page
     if (!user) {
         return (
